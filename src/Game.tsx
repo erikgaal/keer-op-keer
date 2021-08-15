@@ -1,10 +1,10 @@
 import classNames from "classnames";
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, HTMLAttributes, useState } from "react";
 
 import { Color, stringToLevel } from "./levels";
 import { levelOneString } from "./levels/1";
 
-const Box: FunctionComponent = (props) => (
+const Box: FunctionComponent<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div
     {...props}
     className={classNames(
@@ -18,6 +18,9 @@ const Box: FunctionComponent = (props) => (
 
 interface FieldProps {
   color: Color;
+  star: boolean;
+  row: number;
+  column: number;
 }
 
 function getColorClass(color: Color) {
@@ -55,12 +58,14 @@ const CrossIcon = () => (
 function Field(props: FieldProps) {
   const [checked, setChecked] = useState(false);
 
+  const middleRow = props.column === 7;
+
   return (
     <button onClick={() => setChecked(!checked)}>
       <Box
         className={classNames(
           getColorClass(props.color),
-          props.middleRow && "ring-2 ring-white"
+          middleRow && "ring-2 ring-white"
         )}
       >
         {checked && (
@@ -83,7 +88,7 @@ export function Game() {
     <div className="flex flex-col items-center p-4 bg-blue-900 font-black text-2xl rounded-xl shadow-lg">
       <div className="flex space-x-0.5">
         {[...Array(columns)].map((value, index) => (
-          <Box className="bg-white capitalize">
+          <Box className={classNames("bg-white capitalize", index === 7 && 'text-red-500')}>
             {String.fromCharCode(97 + index)}
           </Box>
         ))}
@@ -98,7 +103,8 @@ export function Game() {
             key={index}
             color={value.color}
             star={value.star}
-            middleRow={(Math.round(columns / 2) + index) % columns === 0}
+            row={Math.floor(index / columns)}
+            column={index % columns}
           ></Field>
         ))}
       </div>
