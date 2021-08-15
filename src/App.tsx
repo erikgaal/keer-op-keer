@@ -1,45 +1,42 @@
-import React, { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { FunctionComponent, useRef, useState } from "react";
+import "./App.css";
+
+import { Game } from "./Game";
+import { useWindowSize } from "./hooks/useWindowSize";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div className="h-screen w-screen flex items-center justify-center bg-gray-200">
+      <ScaleToFit>
+        <Game />
+      </ScaleToFit>
     </div>
-  )
+  );
 }
 
-export default App
+const ScaleToFit: FunctionComponent = (props) => {
+  const size = useWindowSize();
+  const ref = useRef<HTMLDivElement>(null);
+
+  let scale = 1;
+
+  if (ref.current && size.height && size.width) {
+    const padding = 32;
+
+    scale = Math.min(
+      size.height / (ref.current.offsetHeight + padding),
+      size.width / (ref.current.offsetWidth + padding)
+    );
+  }
+
+  return (
+    <div
+      className="transition"
+      style={{ transform: `scale(${scale})` }}
+      ref={ref}
+      {...props}
+    />
+  );
+};
+
+export default App;
